@@ -1,5 +1,7 @@
 package com.deliberate.practice.lesson1;
 
+import com.deliberate.practice.exception.ExerciseNotCompletedException;
+
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -40,11 +42,11 @@ public class DynamicThreadPoolManager {
 
     public synchronized int getActiveThreads() {
         // TODO: Implement the logic to return the number of active threads
-        return 0; // Replace with actual implementation
+        throw new ExerciseNotCompletedException(); // Replace with actual implementation
     }
 
     public synchronized int getTaskQueueSize() {
         // TODO: Implement the logic to return the size of the task queue
-        return 0; // Replace with actual implementation
+        throw new ExerciseNotCompletedException(); // Replace with actual implementation
     }
 }
