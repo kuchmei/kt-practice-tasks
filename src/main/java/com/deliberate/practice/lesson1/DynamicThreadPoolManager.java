@@ -1,94 +1,50 @@
 package com.deliberate.practice.lesson1;
 
-import lombok.Builder;
-import lombok.Getter;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-@Getter
-@Builder
 public class DynamicThreadPoolManager {
+
     private final int minThreads;
     private final int maxThreads;
+    private final BlockingQueue<Runnable> taskQueue;
+    private final AtomicBoolean running;
+    private int activeThreads;
+    private Thread monitorThread;
 
-    @Builder.Default
-    private final BlockingQueue<Runnable> taskQueue = new LinkedBlockingQueue<>();
+    public DynamicThreadPoolManager(int minThreads, int maxThreads) {
+        // TODO: Implement parameter validation (check if minThreads, maxThreads are valid)
 
-    @Builder.Default
-    private final List<WorkerThread> threads = new ArrayList<>();
-
-    @Builder.Default
-    private final AtomicInteger activeThreadCount = new AtomicInteger(0);
-
-    @Builder.Default
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-
-    private volatile boolean isRunning;
+        this.minThreads = minThreads;
+        this.maxThreads = maxThreads;
+        this.taskQueue = new LinkedBlockingQueue<>();
+        this.running = new AtomicBoolean(false);
+        this.activeThreads = 0;
+    }
 
     public synchronized void start() {
-        // TODO: Implement the logic to start the thread pool and dynamically manage threads
+        // TODO: Implement the logic to start the thread pool
+        // Example: Create initial worker threads and start the monitor thread
     }
 
     public synchronized void stop() {
-        // TODO: Implement the logic to stop the thread pool and wait for all threads to finish
+        // TODO: Implement the logic to stop the thread pool
+        // Example: Stop the monitor thread, interrupt worker threads, clear the task queue
     }
 
-    public void submitTask(Runnable task) {
-        // TODO: Implement task submission logic
+    public synchronized void submitTask(Runnable task) {
+        // TODO: Implement the logic to submit a task to the pool
+        // Example: Offer the task to the task queue and notify threads
     }
 
-    public ThreadPoolStatus monitorStatus() {
-        // TODO: Implement status monitoring logic
-        return new ThreadPoolStatus(activeThreadCount.get(), taskQueue.size());
+    public synchronized int getActiveThreads() {
+        // TODO: Implement the logic to return the number of active threads
+        return 0; // Replace with actual implementation
     }
 
-    private synchronized void adjustThreadPoolSize() {
-        // TODO: Implement logic to adjust the number of threads based on the task queue size
-    }
-
-    private void addThread() {
-        // TODO: Implement logic to add a new worker thread
-    }
-
-    private void removeThread() {
-        // TODO: Implement logic to remove a worker thread
-    }
-
-    @Getter
-    public static class ThreadPoolStatus {
-        private final int activeThreads;
-        private final int taskQueueSize;
-
-        public ThreadPoolStatus(int activeThreads, int taskQueueSize) {
-            this.activeThreads = activeThreads;
-            this.taskQueueSize = taskQueueSize;
-        }
-    }
-
-    private static class WorkerThread extends Thread {
-        private final BlockingQueue<Runnable> taskQueue;
-        private final AtomicInteger activeThreadCount;
-        private volatile boolean isRunning;
-
-        public WorkerThread(BlockingQueue<Runnable> taskQueue, AtomicInteger activeThreadCount) {
-            this.taskQueue = taskQueue;
-            this.activeThreadCount = activeThreadCount;
-            this.isRunning = true;
-        }
-
-        @Override
-        public void run() {
-            // TODO: Implement worker thread execution logic
-        }
-
-        public void shutdown() {
-            // TODO: Implement worker thread shutdown logic
-        }
+    public synchronized int getTaskQueueSize() {
+        // TODO: Implement the logic to return the size of the task queue
+        return 0; // Replace with actual implementation
     }
 }
