@@ -15,7 +15,11 @@ class DynamicThreadPoolManagerTest {
 
     @BeforeEach
     void setUp() {
-        poolManager = new DynamicThreadPoolManager(minThreads, maxThreads);
+        // Using the builder to create an instance of DynamicThreadPoolManager
+        poolManager = builder()
+                .minThreads(minThreads)
+                .maxThreads(maxThreads)
+                .build();
     }
 
     @AfterEach
@@ -27,14 +31,15 @@ class DynamicThreadPoolManagerTest {
 
     @Test
     void testInitialization() {
-        assertThrows(IllegalStateException.class, () -> {
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
             poolManager.monitorStatus();
         });
+        assertEquals("ThreadPool is not running", exception.getMessage());
     }
 
     @Test
     void testTaskSubmission() {
-        assertThrows(IllegalStateException.class, () -> {
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
             Runnable dummyTask = () -> {
                 try {
                     Thread.sleep(100);
@@ -44,87 +49,92 @@ class DynamicThreadPoolManagerTest {
             };
             poolManager.submitTask(dummyTask);
         });
+        assertEquals("ThreadPool is not running", exception.getMessage());
     }
 
     @Test
     void testDynamicScaling() {
-        assertThrows(IllegalStateException.class, () -> {
-            poolManager.start();
+        poolManager.start();
 
-            Runnable dummyTask = () -> {
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
-            };
-
-            for (int i = 0; i < 20; i++) {
-                poolManager.submitTask(dummyTask);
+        Runnable dummyTask = () -> {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
             }
+        };
 
-            Thread.sleep(1000);  // Give some time for threads to potentially scale
+        for (int i = 0; i < 20; i++) {
+            poolManager.submitTask(dummyTask);
+        }
 
-            ThreadPoolStatus status = poolManager.monitorStatus();
-            assertTrue(status.activeThreads() >= minThreads);
-            assertTrue(status.activeThreads() <= maxThreads);
-        });
+        try {
+            Thread.sleep(2000);  // Give some time for threads to potentially scale
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        ThreadPoolStatus status = poolManager.monitorStatus();
+        assertTrue(status.getActiveThreads() >= minThreads);
+        assertTrue(status.getActiveThreads() <= maxThreads);
     }
 
     @Test
     void testLoadBalancing() {
-        assertThrows(IllegalStateException.class, () -> {
-            poolManager.start();
+        poolManager.start();
 
-            Runnable quickTask = () -> {
-                try {
-                    Thread.sleep(10);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
-            };
-
-            Runnable slowTask = () -> {
-                try {
-                    Thread.sleep(200);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
-            };
-
-            for (int i = 0; i < 5; i++) {
-                poolManager.submitTask(quickTask);
+        Runnable quickTask = () -> {
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
             }
+        };
 
-            for (int i = 0; i < 5; i++) {
-                poolManager.submitTask(slowTask);
+        Runnable slowTask = () -> {
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
             }
+        };
 
-            Thread.sleep(1000);  // Give some time for tasks to be processed
+        for (int i = 0; i < 5; i++) {
+            poolManager.submitTask(quickTask);
+        }
 
-            ThreadPoolStatus status = poolManager.monitorStatus();
-            assertTrue(status.activeThreads() >= minThreads);
-        });
+        for (int i = 0; i < 5; i++) {
+            poolManager.submitTask(slowTask);
+        }
+
+        try {
+            Thread.sleep(2000);  // Give some time for tasks to be processed
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        ThreadPoolStatus status = poolManager.monitorStatus();
+        assertTrue(status.getActiveThreads() >= minThreads);
     }
 
     @Test
     void testPoolShutdown() {
-        assertThrows(IllegalStateException.class, () -> {
-            poolManager.start();
+        poolManager.start();
 
-            Runnable dummyTask = () -> {
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
-            };
+        Runnable dummyTask = () -> {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        };
 
-            poolManager.submitTask(dummyTask);
-            poolManager.stop();
+        poolManager.submitTask(dummyTask);
+        poolManager.stop();
 
-            ThreadPoolStatus status = poolManager.monitorStatus();
-            assertEquals(0, status.activeThreads());
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+            poolManager.monitorStatus();
         });
+        assertEquals("ThreadPool is not running", exception.getMessage());
     }
 }
