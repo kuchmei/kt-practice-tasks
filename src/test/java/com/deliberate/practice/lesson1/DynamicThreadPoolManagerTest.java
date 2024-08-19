@@ -1,13 +1,14 @@
 package com.deliberate.practice.lesson1;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.lang.reflect.Field;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class DynamicThreadPoolManagerTest {
 
     private DynamicThreadPoolManager pool;
@@ -18,6 +19,7 @@ public class DynamicThreadPoolManagerTest {
     }
 
     @Test
+    @Order(1)
     public void testStartPoolWithInvalidParameters() {
         assertThrows(IllegalArgumentException.class, () -> {
             new DynamicThreadPoolManager(-1, 5); // Negative minimum threads
@@ -33,6 +35,7 @@ public class DynamicThreadPoolManagerTest {
     }
 
     @Test
+    @Order(2)
     public void testMinimumThreadsAfterStart() {
         pool.start();
 
@@ -40,6 +43,7 @@ public class DynamicThreadPoolManagerTest {
     }
 
     @Test
+    @Order(3)
     public void testStartPoolTwice() {
         pool.start();
         pool.start(); // Start the pool a second time
@@ -48,6 +52,7 @@ public class DynamicThreadPoolManagerTest {
     }
 
     @Test
+    @Order(4)
     public void testStopPoolWithoutStarting() {
         pool.stop(); // Attempt to stop the pool before it starts
 
@@ -56,11 +61,23 @@ public class DynamicThreadPoolManagerTest {
     }
 
     @Test
-    public void testStopCorrectlyShutsDownAllThreads() throws InterruptedException {
+    @Order(5)
+    public void testStopCorrectlyShutsDownAllThreads() throws InterruptedException, NoSuchFieldException, IllegalAccessException {
         pool.start();
 
+        // Directly manipulate the private activeThreads field
+        Field activeThreadsField = pool.getClass().getDeclaredField("activeThreads");
+        activeThreadsField.setAccessible(true);
+        activeThreadsField.set(pool, 5); // Simulate 5 active threads
+
+        // Directly manipulate the private taskQueue field
+        Field taskQueueField = pool.getClass().getDeclaredField("taskQueue");
+        taskQueueField.setAccessible(true);
+        BlockingQueue<Runnable> taskQueue = (BlockingQueue<Runnable>) taskQueueField.get(pool);
+
+        // Add dummy tasks to the queue
         for (int i = 0; i < 5; i++) {
-            pool.submitTask(() -> {
+            taskQueue.offer(() -> {
                 try {
                     Thread.sleep(1000); // Simulate a long-running task
                 } catch (InterruptedException e) {
@@ -69,7 +86,29 @@ public class DynamicThreadPoolManagerTest {
             });
         }
 
+        // Simulate thread processing tasks
+        for (int i = 0; i < 5; i++) {
+            Thread workerThread = new Thread(() -> {
+                try {
+                    while (!Thread.currentThread().isInterrupted()) {
+                        Runnable task = taskQueue.poll(500, TimeUnit.MILLISECONDS);
+                        if (task != null) {
+                            task.run();
+                        } else {
+                            break;
+                        }
+                    }
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            });
+
+            workerThread.start();
+        }
+
         Thread.sleep(500); // Wait until some tasks are being processed
+
+        // Stop the pool and verify shutdown
         pool.stop();
 
         assertEquals(0, getActiveThreadsViaReflection(), "Thread pool did not shut down all threads on stop");
@@ -77,6 +116,7 @@ public class DynamicThreadPoolManagerTest {
     }
 
     @Test
+    @Order(6)
     public void testSubmitTasksAfterPoolStart() throws InterruptedException {
         pool.start();
 
@@ -94,6 +134,7 @@ public class DynamicThreadPoolManagerTest {
     }
 
     @Test
+    @Order(7)
     public void testSubmitTaskToStoppedPool() {
         pool.start();
         pool.stop(); // Stop the pool
@@ -105,6 +146,7 @@ public class DynamicThreadPoolManagerTest {
     }
 
     @Test
+    @Order(8)
     public void testAdjustThreadCount() throws InterruptedException {
         pool.start();
 
@@ -129,6 +171,7 @@ public class DynamicThreadPoolManagerTest {
     }
 
     @Test
+    @Order(9)
     public void testMaximumThreadsNotExceeded() throws InterruptedException {
         pool.start();
 
@@ -148,6 +191,7 @@ public class DynamicThreadPoolManagerTest {
     }
 
     @Test
+    @Order(10)
     public void testHandleEmptyQueueGracefully() throws InterruptedException {
         pool.start();
 
@@ -157,6 +201,7 @@ public class DynamicThreadPoolManagerTest {
     }
 
     @Test
+    @Order(11)
     public void testThreadPoolShrinksBackToMinimum() throws InterruptedException {
         pool.start();
 
@@ -177,6 +222,7 @@ public class DynamicThreadPoolManagerTest {
     }
 
     @Test
+    @Order(12)
     public void testTaskQueueOverflow() throws InterruptedException {
         pool.start();
 
@@ -197,6 +243,7 @@ public class DynamicThreadPoolManagerTest {
     }
 
     @Test
+    @Order(13)
     public void testGetActiveThreads() throws InterruptedException {
         pool.start();  // Start the thread pool
 

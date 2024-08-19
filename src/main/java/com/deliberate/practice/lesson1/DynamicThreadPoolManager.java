@@ -28,25 +28,28 @@ public class DynamicThreadPoolManager {
     public synchronized void start() {
         // TODO: Implement the logic to start the thread pool
         // Example: Create initial worker threads and start the monitor thread
+        throw new ExerciseNotCompletedException();
     }
 
     public synchronized void stop() {
         // TODO: Implement the logic to stop the thread pool
         // Example: Stop the monitor thread, interrupt worker threads, clear the task queue
+        throw new ExerciseNotCompletedException();
     }
 
     public synchronized void submitTask(Runnable task) {
         // TODO: Implement the logic to submit a task to the pool
         // Example: Offer the task to the task queue and notify threads
+        throw new ExerciseNotCompletedException();
     }
 
     public synchronized int getActiveThreads() {
         // TODO: Implement the logic to return the number of active threads
-        throw new ExerciseNotCompletedException(); // Replace with actual implementation
+        throw new ExerciseNotCompletedException();
     }
 
     public synchronized int getTaskQueueSize() {
         // TODO: Implement the logic to return the size of the task queue
-        throw new ExerciseNotCompletedException(); // Replace with actual implementation
+        throw new ExerciseNotCompletedException();
     }
 }
