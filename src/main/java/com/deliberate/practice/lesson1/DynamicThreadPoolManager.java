@@ -31,6 +31,7 @@ public class DynamicThreadPoolManager {
         // TODO: Increment the number of active threads.
         // - Increase activeThreads by 1.
         // - Print a message indicating the number of active threads.
+        throw new ExerciseNotCompletedException();
     }
 
     synchronized void decrementActiveThreads() {
@@ -38,6 +39,7 @@ public class DynamicThreadPoolManager {
         // - Ensure activeThreads does not go below minThreads.
         // - If activeThreads is greater than minThreads, decrease it by 1.
         // - Print a message indicating the number of active threads.
+        throw new ExerciseNotCompletedException();
     }
 
     void createWorkerThread() {
@@ -47,12 +49,14 @@ public class DynamicThreadPoolManager {
         // - If a task is found, execute it.
         // - If interrupted or if no tasks are found, exit the loop.
         // TODO: Start the new worker thread.
+        throw new ExerciseNotCompletedException();
     }
 
     void adjustThreadCount() {
         // TODO: Implement the logic to adjust the number of worker threads.
         // - If the taskQueue size > activeThreads and activeThreads < maxThreads, create new worker threads.
         // - If the taskQueue is empty and activeThreads > minThreads, reduce the number of active threads.
+        throw new ExerciseNotCompletedException();
     }
 
     void monitor() {
@@ -61,6 +65,7 @@ public class DynamicThreadPoolManager {
         // - Periodically check the size of the taskQueue.
         // - Adjust the number of active worker threads by calling adjustThreadCount().
         // - If the monitor thread is interrupted, it should gracefully exit.
+        throw new ExerciseNotCompletedException();
     }
 
     public synchronized void start() {
@@ -70,6 +75,7 @@ public class DynamicThreadPoolManager {
         // - Set the running flag to true.
         // - Create initial worker threads using createWorkerThread().
         // - Start a monitor thread that will handle adjusting the thread count.
+        throw new ExerciseNotCompletedException();
     }
 
     public synchronized void stop() {
@@ -81,6 +87,7 @@ public class DynamicThreadPoolManager {
         // - Interrupt all worker threads.
         // - Clear the task queue.
         // - Reset activeThreads to 0.
+        throw new ExerciseNotCompletedException();
     }
 
     public synchronized void submitTask(Runnable task) {
@@ -89,6 +96,7 @@ public class DynamicThreadPoolManager {
         // - If running, add the task to the taskQueue.
         // - Notify waiting worker threads that there is a new task available.
         // - If not running, print a message and do not accept the task.
+        throw new ExerciseNotCompletedException();
     }
 
     public synchronized int getActiveThreads() {
