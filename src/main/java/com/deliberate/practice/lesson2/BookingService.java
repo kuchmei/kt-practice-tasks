@@ -1,12 +1,11 @@
 package com.deliberate.practice.lesson2;
 
-import com.deliberate.practice.exception.ExerciseNotCompletedException;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * BookingService manages seat reservations for multiple shows in a theater.
@@ -23,10 +22,12 @@ public class BookingService {
      * @param shows A map where the key is the show ID and the value is the set of available seats.
      */
     public BookingService(Map<String, Set<String>> shows) {
-        this.shows = shows;
+        this.shows = new ConcurrentHashMap<>(shows);
         this.bookings = new ConcurrentHashMap<>();
         this.showLocks = new ConcurrentHashMap<>();
-        // Add code to initialize locks for each show (if necessary)
+        for (String showId : shows.keySet()) {
+            showLocks.put(showId, new ReentrantLock());
+        }
     }
 
     /**
@@ -38,7 +39,30 @@ public class BookingService {
      * @return true if the booking is successful, false if any seat is already booked.
      */
     public boolean bookSeats(String showId, List<String> seats, String user) {
-        throw new ExerciseNotCompletedException();
+        Lock lock = showLocks.get(showId);
+        lock.lock();
+        try {
+            Set<String> availableSeats = shows.get(showId);
+            for (String seat : seats) {
+                if (!availableSeats.contains(seat)) {
+                    return false;  // Seat does not exist in the show
+                }
+            }
+
+            Map<String, String> showBookings = bookings.computeIfAbsent(showId, k -> new ConcurrentHashMap<>());
+            for (String seat : seats) {
+                if (showBookings.containsKey(seat)) {
+                    return false;  // Seat already booked
+                }
+            }
+            for (String seat : seats) {
+                showBookings.put(seat, user);
+                shows.get(showId).remove(seat);
+            }
+            return true;
+        } finally {
+            lock.unlock();
+        }
     }
 
     /**
@@ -50,7 +74,25 @@ public class BookingService {
      * @return true if the cancellation is successful, false if any seat was not booked by the user.
      */
     public boolean cancelBooking(String showId, List<String> seats, String user) {
-        throw new ExerciseNotCompletedException();
+        Lock lock = showLocks.get(showId);
+        lock.lock();
+        try {
+            Map<String, String> showBookings = bookings.get(showId);
+            if (showBookings == null) return false;
+
+            for (String seat : seats) {
+                if (!user.equals(showBookings.get(seat))) {
+                    return false;  // Seat was not booked by this user
+                }
+            }
+            for (String seat : seats) {
+                showBookings.remove(seat);
+                shows.get(showId).add(seat);
+            }
+            return true;
+        } finally {
+            lock.unlock();
+        }
     }
 
     /**
@@ -60,7 +102,6 @@ public class BookingService {
      * @return A set of available seats.
      */
     public Set<String> checkAvailability(String showId) {
-        throw new ExerciseNotCompletedException();
-
+        return shows.get(showId);
     }
 }
