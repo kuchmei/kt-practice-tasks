@@ -1,4 +1,4 @@
-package com.deliberate.practice.lesson2;
+package com.deliberate.practice.lesson2.task;
 
 import java.util.List;
 import java.util.Map;
