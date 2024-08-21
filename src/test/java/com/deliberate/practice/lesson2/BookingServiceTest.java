@@ -1,5 +1,6 @@
 package com.deliberate.practice.lesson2;
 
+import com.deliberate.practice.lesson2.task.BookingService;
 import org.junit.jupiter.api.*;
 
 import java.util.*;
@@ -58,6 +59,13 @@ public class BookingServiceTest {
 
     @Test
     @Order(5)
+    public void testBookMultipleSeatsWithOneNotExisted() {
+        boolean success = bookingService.bookSeats("Show1", Arrays.asList("A1", "D2"), "User2");
+        assertFalse(success, "Booking multiple seats where one is already booked should fail.");
+    }
+
+    @Test
+    @Order(6)
     @Timeout(value = 5, unit = TimeUnit.SECONDS)
     public void testConcurrentBookSeats() throws InterruptedException {
         int threadCount = 10;
@@ -91,7 +99,7 @@ public class BookingServiceTest {
     }
 
     @Test
-    @Order(6)
+    @Order(7)
     public void testCancelBookingSuccess() {
         bookingService.bookSeats("Show1", List.of("A1"), "User1");
         boolean success = bookingService.cancelBooking("Show1", List.of("A1"), "User1");
@@ -99,7 +107,7 @@ public class BookingServiceTest {
     }
 
     @Test
-    @Order(7)
+    @Order(8)
     public void testCancelBookingFailWrongUser() {
         bookingService.bookSeats("Show1", List.of("A1"), "User1");
         boolean success = bookingService.cancelBooking("Show1", List.of("A1"), "User2");
@@ -107,14 +115,14 @@ public class BookingServiceTest {
     }
 
     @Test
-    @Order(8)
+    @Order(9)
     public void testCancelBookingFailNotBooked() {
         boolean success = bookingService.cancelBooking("Show1", List.of("A1"), "User1");
         assertFalse(success, "Canceling a seat that was not booked should fail.");
     }
 
     @Test
-    @Order(9)
+    @Order(10)
     public void testCancelMultipleSeatsSuccess() {
         bookingService.bookSeats("Show1", Arrays.asList("A1", "A2"), "User1");
         boolean success = bookingService.cancelBooking("Show1", Arrays.asList("A1", "A2"), "User1");
@@ -122,7 +130,7 @@ public class BookingServiceTest {
     }
 
     @Test
-    @Order(10)
+    @Order(11)
     public void testCancelMultipleSeatsPartialFailure() {
         bookingService.bookSeats("Show1", List.of("A1"), "User1");
         bookingService.bookSeats("Show1", List.of("A2"), "User2");
@@ -131,7 +139,7 @@ public class BookingServiceTest {
     }
 
     @Test
-    @Order(11)
+    @Order(12)
     @Timeout(value = 5, unit = TimeUnit.SECONDS)
     public void testConcurrentCancelBooking() throws InterruptedException {
         bookingService.bookSeats("Show1", Arrays.asList("A1"), "User1");
@@ -166,14 +174,14 @@ public class BookingServiceTest {
     }
 
     @Test
-    @Order(12)
+    @Order(13)
     public void testCheckAvailabilityInitial() {
         Set<String> availableSeats = bookingService.checkAvailability("Show1");
         assertEquals(new HashSet<>(Arrays.asList("A1", "A2", "A3", "A4")), availableSeats, "Initial seat availability should match the configured seats.");
     }
 
     @Test
-    @Order(13)
+    @Order(14)
     public void testCheckAvailabilityAfterBooking() {
         bookingService.bookSeats("Show1", Arrays.asList("A1"), "User1");
         Set<String> availableSeats = bookingService.checkAvailability("Show1");
@@ -181,7 +189,7 @@ public class BookingServiceTest {
     }
 
     @Test
-    @Order(14)
+    @Order(15)
     public void testCheckAvailabilityAfterCancellation() {
         bookingService.bookSeats("Show1", Arrays.asList("A1"), "User1");
         bookingService.cancelBooking("Show1", Arrays.asList("A1"), "User1");
@@ -190,7 +198,7 @@ public class BookingServiceTest {
     }
 
     @Test
-    @Order(15)
+    @Order(16)
     public void testCheckAvailabilityAfterMultipleBookingsAndCancellations() {
         bookingService.bookSeats("Show1", Arrays.asList("A1", "A2"), "User1");
         bookingService.bookSeats("Show1", Arrays.asList("A3"), "User2");
@@ -200,7 +208,7 @@ public class BookingServiceTest {
     }
 
     @Test
-    @Order(16)
+    @Order(17)
     @Timeout(value = 5, unit = TimeUnit.SECONDS)
     public void testConcurrentCheckAvailability() throws InterruptedException {
         int threadCount = 10;

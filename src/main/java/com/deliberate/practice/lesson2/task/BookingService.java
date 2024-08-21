@@ -1,4 +1,4 @@
-package com.deliberate.practice.lesson2;
+package com.deliberate.practice.lesson2.task;
 
 import com.deliberate.practice.exception.ExerciseNotCompletedException;
 
