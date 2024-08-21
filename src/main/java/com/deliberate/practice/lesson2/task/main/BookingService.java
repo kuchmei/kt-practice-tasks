@@ -13,7 +13,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class BookingService {
     private final Map<String, Set<String>> shows;  // Show ID -> Set of available seats
-    private final Map<String, Map<String, String>> bookings;  // Show ID -> Seat -> User
+    protected final Map<String, Map<String, String>> bookings;  // Show ID -> Seat -> User
     private final Map<String, Lock> showLocks;  // Show ID -> Lock for synchronization
 
     /**

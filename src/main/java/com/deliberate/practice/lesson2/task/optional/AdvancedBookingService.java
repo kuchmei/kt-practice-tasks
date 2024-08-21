@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -40,7 +41,16 @@ public class AdvancedBookingService extends BookingService {
      * @return true if the booking is successful or the user is added to the waiting list, false otherwise.
      */
     public boolean bookSeatsWithWaitingList(String showId, List<String> seats, String user) {
-        throw new ExerciseNotCompletedException();
+        boolean success = super.bookSeats(showId, seats, user);
+        if (!success) {
+            for (String seat : seats) {
+                waitingLists
+                        .computeIfAbsent(showId, k -> new ConcurrentHashMap<>())
+                        .computeIfAbsent(seat, k -> new ConcurrentLinkedQueue<>())
+                        .add(user);
+            }
+        }
+        return success;
     }
 
     /**
@@ -50,7 +60,13 @@ public class AdvancedBookingService extends BookingService {
      * @param seat   The seat to assign to the next user in the waiting list.
      */
     private void processWaitingList(String showId, String seat) {
-        throw new ExerciseNotCompletedException();
+        Queue<String> waitingList = waitingLists.getOrDefault(showId, new ConcurrentHashMap<>()).get(seat);
+        if (waitingList != null && !waitingList.isEmpty()) {
+            String nextUser = waitingList.poll();
+            if (nextUser != null) {
+                super.bookSeats(showId, List.of(seat), nextUser);
+            }
+        }
     }
 
     /**
@@ -62,7 +78,13 @@ public class AdvancedBookingService extends BookingService {
      * @return true if the cancellation is successful, false if any seat was not booked by the user.
      */
     public boolean cancelBookingWithWaitingList(String showId, List<String> seats, String user) {
-        throw new ExerciseNotCompletedException();
+        boolean success = super.cancelBooking(showId, seats, user);
+        if (success) {
+            for (String seat : seats) {
+                processWaitingList(showId, seat);
+            }
+        }
+        return success;
     }
 
     /**
@@ -76,7 +98,20 @@ public class AdvancedBookingService extends BookingService {
      * @return true if the booking is successful, false if any seat is already booked.
      */
     public boolean bookSeatsWithTimeout(String showId, List<String> seats, String user, long timeout, TimeUnit timeUnit) {
-        throw new ExerciseNotCompletedException();
+        boolean success = super.bookSeats(showId, seats, user);
+        if (success) {
+            for (String seat : seats) {
+                scheduler.schedule(() -> {
+                    synchronized (this) {
+                        if (bookings.get(showId).get(seat).equals(user)) {
+                            super.cancelBooking(showId, List.of(seat), user);
+                            processWaitingList(showId, seat);
+                        }
+                    }
+                }, timeout, timeUnit);
+            }
+        }
+        return success;
     }
 
     /**
@@ -88,6 +123,12 @@ public class AdvancedBookingService extends BookingService {
      * @return true if the confirmation is successful, false otherwise.
      */
     public boolean confirmBooking(String showId, String seat, String user) {
-        throw new ExerciseNotCompletedException();
+        synchronized (this) {
+            if (bookings.get(showId).get(seat).equals(user)) {
+                scheduler.shutdownNow(); // Cancel the timeout task
+                return true;
+            }
+        }
+        return false;
     }
 }
