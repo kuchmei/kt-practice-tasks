@@ -1,6 +1,5 @@
-package com.deliberate.practice.lesson2;
+package com.deliberate.practice.lesson2.task.main;
 
-import com.deliberate.practice.lesson2.task.BookingService;
 import org.junit.jupiter.api.*;
 
 import java.util.*;
