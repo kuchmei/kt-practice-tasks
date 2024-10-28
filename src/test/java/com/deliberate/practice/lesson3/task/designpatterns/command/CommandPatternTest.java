@@ -1,8 +1,8 @@
 package com.deliberate.practice.lesson3.task.designpatterns.command;
 
 /*
-import com.deliberate.practice.lesson3.v3.task.designpatterns.factory.CreditCardPayment;
-import com.deliberate.practice.lesson3.v3.task.designpatterns.factory.PayPalPayment;
+import com.deliberate.practice.lesson3.task.designpatterns.factory.CreditCardPayment;
+import com.deliberate.practice.lesson3.task.designpatterns.factory.PayPalPayment;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
