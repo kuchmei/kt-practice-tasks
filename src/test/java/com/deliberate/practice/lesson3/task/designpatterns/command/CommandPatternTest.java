@@ -1,6 +1,5 @@
 package com.deliberate.practice.lesson3.task.designpatterns.command;
 
-/*
 import com.deliberate.practice.lesson3.task.designpatterns.factory.CreditCardPayment;
 import com.deliberate.practice.lesson3.task.designpatterns.factory.PayPalPayment;
 import org.junit.jupiter.api.AfterEach;
@@ -60,4 +59,3 @@ class CommandPatternTest {
         assertTrue(output.contains("Undoing PayPal payment"));
     }
 }
-*/

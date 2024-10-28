@@ -1,6 +1,5 @@
 package com.deliberate.practice.lesson3.task.designpatterns.decorator;
 
-/*
 import com.deliberate.practice.lesson3.task.designpatterns.factory.CreditCardPayment;
 import com.deliberate.practice.lesson3.task.designpatterns.factory.PayPalPayment;
 import com.deliberate.practice.lesson3.task.designpatterns.factory.PaymentProcessor;
@@ -45,4 +44,3 @@ class LoggingDecoratorTest {
         assertTrue(output.contains("Processing payment with PayPal"));
     }
 }
-*/

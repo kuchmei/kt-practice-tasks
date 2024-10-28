@@ -1,7 +1,5 @@
 package com.deliberate.practice.lesson3.warmup;
 
-import com.deliberate.practice.exception.ExerciseNotCompletedException;
-
 public class StringProcessor {
 
     /**
@@ -12,6 +10,18 @@ public class StringProcessor {
      * @return a new string with each word reversed
      */
     public static String reverseWords(String input) {
-        throw new ExerciseNotCompletedException();
+        if (input == null || input.isEmpty()) {
+            return input;
+        }
+        String[] words = input.split(" ");
+        StringBuilder result = new StringBuilder();
+        for (String word : words) {
+            if (!word.isEmpty()) {
+                result.append(new StringBuilder(word).reverse().toString()).append(" ");
+            } else {
+                result.append(" "); // Maintain spaces
+            }
+        }
+        return result.toString().trim();
     }
 }
